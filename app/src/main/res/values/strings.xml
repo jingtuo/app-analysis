@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">应用分析</string>
+    <string name="title_activity_page">PageActivity</string>
 </resources>

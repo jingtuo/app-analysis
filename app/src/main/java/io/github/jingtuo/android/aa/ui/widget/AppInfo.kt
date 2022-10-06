@@ -20,17 +20,18 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
-import io.github.jingtuo.android.aa.ext.getAllPkg
-import io.github.jingtuo.android.aa.ui.model.PkgInfo
+import io.github.jingtuo.android.aa.ext.getAllActivity
+import io.github.jingtuo.android.aa.ext.getPkg
+import io.github.jingtuo.android.aa.ui.model.ActivityInfo
 
 @Composable
-fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
+fun AppInfo(pkgName: String) {
     val context = LocalContext.current
-    val allPkg = context.getAllPkg()
-    val liveDataPkgList = MutableLiveData<List<PkgInfo>>()
+    val pkgInfo = context.getPkg(pkgName)
+    val allActivity = context.getAllActivity(pkgName)
     Scaffold(
         topBar = {
-            HomeTopAppBar(onClickCollectLog)
+            MyTopAppBar(title = pkgInfo.appName)
         }
     ) { innerPadding ->
         Surface(
@@ -38,7 +39,8 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
         ) {
             Column(modifier = Modifier.padding(top = 10.dp)) {
                 var searchText by remember { mutableStateOf("") }
-                val curPkgList = liveDataPkgList.observeAsState(allPkg)
+                val liveDataActivityList = MutableLiveData<List<ActivityInfo>>()
+                val curActivityList = liveDataActivityList.observeAsState(allActivity)
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -48,9 +50,9 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
                         value = searchText,
                         onValueChange = {
                             searchText = it
-                            liveDataPkgList.value = allPkg.filter { pkgInfo ->
-                                pkgInfo.pkgName.contains(searchText)
-                                        || pkgInfo.appName.contains(searchText)
+                            liveDataActivityList.value = allActivity.filter { pkgInfo ->
+                                pkgInfo.name.contains(searchText)
+                                        || pkgInfo.clsName.contains(searchText)
                             }
                         },
                         leadingIcon = {
@@ -79,34 +81,28 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
                     )
                 }
                 LazyColumn {
-                    items(curPkgList.value) { it ->
-                        AppRow(it, onClickItem)
+                    items(curActivityList.value) { it ->
+                        ActivityRow(it)
                         Divider()
                     }
                 }
             }
         }
-
     }
-
 }
 
 @Composable
-fun AppRow(pkgInfo: PkgInfo, onClickItem: (pkgName: String) -> Unit) {
+fun ActivityRow(activityInfo: ActivityInfo) {
     Column(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(16.dp, 10.dp)
-            .clickable {
-                onClickItem(pkgInfo.pkgName)
-            }
     ) {
         Text(
-            text = pkgInfo.appName,
+            text = activityInfo.name,
             color = MaterialTheme.colors.onBackground
         )
         Text(
-            text = pkgInfo.pkgName,
+            text = activityInfo.clsName,
             color = MaterialTheme.colors.onBackground,
             fontSize = 14.sp
         )
