@@ -6,12 +6,17 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import io.github.jingtuo.android.aa.repo.LogRepo
 import io.github.jingtuo.android.aa.ui.theme.AppAnalysisTheme
 
 class MainActivity : ComponentActivity() {
 
+    var logRepo: LogRepo? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        logRepo = LogRepo(appContext = applicationContext)
+        logRepo!!.startLogCat()
         setContent {
             AppAnalysisTheme {
                 //NavController必须在最顶层定义, 因为它要管理所有页面
@@ -20,7 +25,7 @@ class MainActivity : ComponentActivity() {
                 val currentDestination = currentBackStack?.destination
                 val currentScreen = allDestination
                     .find { it.route == currentDestination?.route } ?: AppListDestination
-                MyNavHost(navController = navController)
+                MyNavHost(navController = navController, application = application)
             }
         }
     }

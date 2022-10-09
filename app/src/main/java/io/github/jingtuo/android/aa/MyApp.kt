@@ -9,9 +9,9 @@ class MyApp: Application() {
     override fun onCreate() {
         super.onCreate()
         //严苛模式
-        StrictMode.setThreadPolicy(ThreadPolicy.Builder()
-            .detectAll()
-            .penaltyLog()
-            .build())
+//        StrictMode.setThreadPolicy(ThreadPolicy.Builder()
+//            .detectAll()
+//            .penaltyLog()
+//            .build())
     }
 }

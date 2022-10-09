@@ -19,12 +19,12 @@ object AppInfoDestination: MyDestination {
         get() = "app_info/{pkgName}"
 }
 
-object LogInfoDestination: MyDestination {
+object LogListDestination: MyDestination {
     override val title: String
-        get() = "日志信息"
+        get() = "日志列表"
     override val route: String
-        get() = "log_info"
+        get() = "log_list"
 }
 
 
-val allDestination = listOf(AppListDestination, AppInfoDestination, LogInfoDestination)
+val allDestination = listOf(AppListDestination, AppInfoDestination, LogListDestination)

@@ -1,6 +1,7 @@
 package io.github.jingtuo.android.aa.ui.widget
 
-import androidx.compose.foundation.clickable
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,14 +10,14 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import io.github.jingtuo.android.aa.R
 
 @Composable
-fun HomeTopAppBar(onClickCollectLog: () -> Unit) {
+fun HomeTopAppBar(onClickLog: () -> Unit) {
     Surface(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -42,34 +43,37 @@ fun HomeTopAppBar(onClickCollectLog: () -> Unit) {
                         start.linkTo(logoId.end, 10.dp)
                     }
                 )
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_baseline_stream_24),
-                    contentDescription = "collect log",
+                OutlinedButton(
                     modifier = Modifier
                         .constrainAs(logId) {
                             top.linkTo(parent.top, 0.dp)
                             bottom.linkTo(parent.bottom, 0.dp)
                             end.linkTo(parent.end, 10.dp)
-                        }
-                        .clickable {
-                            onClickCollectLog()
-                        }
-                )
+                        },
+                    onClick = onClickLog,
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        backgroundColor = Color.Transparent,
+                        contentColor = MaterialTheme.colors.onPrimary,
+                    ),
+                    border = BorderStroke(0.5.dp, MaterialTheme.colors.onPrimary)
+                ) {
+                    Text("Log")
+                }
             }
         }
     }
 }
 
 @Composable
-fun MyTopAppBar(title: String, bitmap: ImageBitmap) {
+fun MyTopAppBar(title: String, @DrawableRes id: Int) {
     TopAppBar(
         modifier = Modifier.fillMaxWidth(),
         contentPadding = PaddingValues(horizontal = 10.dp)
     ) {
         Row(
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Icon(bitmap = bitmap, contentDescription = "app bar icon")
+            Icon(painter = painterResource(id), contentDescription = "app bar icon")
             Text(text = title, modifier = Modifier.padding(horizontal = 10.dp))
         }
     }

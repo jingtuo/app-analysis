@@ -1,5 +1,6 @@
 package io.github.jingtuo.android.aa.ui.widget
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,68 +21,58 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
-import io.github.jingtuo.android.aa.ext.getAllActivity
-import io.github.jingtuo.android.aa.ext.getPkg
-import io.github.jingtuo.android.aa.ui.model.ActivityInfo
+import io.github.jingtuo.android.aa.ext.activities
+import io.github.jingtuo.android.aa.ext.clsName
+import io.github.jingtuo.android.aa.ext.label
+import io.github.jingtuo.android.aa.ext.packageInfo
 
 @Composable
 fun AppInfo(pkgName: String) {
     val context = LocalContext.current
-    val pkgInfo = context.getPkg(pkgName)
-    val allActivity = context.getAllActivity(pkgName)
-    Scaffold(
-        topBar = {
-            MyTopAppBar(title = pkgInfo.appName)
-        }
-    ) { innerPadding ->
+    val pkgInfo = context.packageInfo(pkgName)
+    val activities = context.activities(pkgName)
+    Scaffold(topBar = {
+        MyTopAppBar(title = pkgInfo.label(context.packageManager) ?: "应用信息")
+    }) { innerPadding ->
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
             Column(modifier = Modifier.padding(top = 10.dp)) {
                 var searchText by remember { mutableStateOf("") }
-                val liveDataActivityList = MutableLiveData<List<ActivityInfo>>()
-                val curActivityList = liveDataActivityList.observeAsState(allActivity)
+                val liveDataCurActivities = MutableLiveData<List<ActivityInfo>>()
+                val curActivities = liveDataCurActivities.observeAsState(activities)
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
                         .fillMaxWidth()
                 ) {
-                    OutlinedTextField(
-                        value = searchText,
-                        onValueChange = {
-                            searchText = it
-                            liveDataActivityList.value = allActivity.filter { pkgInfo ->
-                                pkgInfo.name.contains(searchText)
-                                        || pkgInfo.clsName.contains(searchText)
-                            }
-                        },
-                        leadingIcon = {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = "搜索"
-                            )
-                        },
-                        trailingIcon = {
-                            if (searchText.isNotEmpty()) {
-                                Icon(
-                                    imageVector = Icons.Default.Clear,
-                                    contentDescription = "清除",
-                                    modifier = Modifier
-                                        .size(16.dp)
-                                        .clickable {
-                                            searchText = ""
-                                        }
-                                )
-                            }
-                        },
-                        maxLines = 1,
-                        keyboardOptions = KeyboardOptions(
-                            imeAction = ImeAction.Search
+                    OutlinedTextField(value = searchText, onValueChange = {
+                        searchText = it
+                        liveDataCurActivities.value = activities.filter { activityInfo ->
+                            activityInfo.label(context.packageManager).contains(searchText)
+                                    || activityInfo.clsName().contains(searchText)
+                        }
+                    }, leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search, contentDescription = "搜索"
                         )
+                    }, trailingIcon = {
+                        if (searchText.isNotEmpty()) {
+                            Icon(imageVector = Icons.Default.Clear,
+                                contentDescription = "清除",
+                                modifier = Modifier
+                                    .size(16.dp)
+                                    .clickable {
+                                        searchText = ""
+                                    })
+                        }
+                    }, maxLines = 1, keyboardOptions = KeyboardOptions(
+                        imeAction = ImeAction.Search
+                    )
                     )
                 }
                 LazyColumn {
-                    items(curActivityList.value) { it ->
+                    items(curActivities.value) { it ->
                         ActivityRow(it)
                         Divider()
                     }
@@ -93,16 +84,16 @@ fun AppInfo(pkgName: String) {
 
 @Composable
 fun ActivityRow(activityInfo: ActivityInfo) {
+    val context = LocalContext.current
     Column(
-        modifier = Modifier
-            .padding(16.dp, 10.dp)
+        modifier = Modifier.padding(16.dp, 10.dp)
     ) {
         Text(
-            text = activityInfo.name,
+            text = activityInfo.label(context.packageManager),
             color = MaterialTheme.colors.onBackground
         )
         Text(
-            text = activityInfo.clsName,
+            text = activityInfo.clsName(),
             color = MaterialTheme.colors.onBackground,
             fontSize = 14.sp
         )

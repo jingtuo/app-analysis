@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.kapt'
 }
 
 android {
@@ -17,6 +18,14 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary true
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += [
+                        "room.schemaLocation":"$projectDir/schemas".toString(),
+                        "room.incremental":"true",
+                        "room.expandProjection":"true"]
+            }
         }
     }
 
@@ -64,9 +73,23 @@ dependencies {
     implementation "androidx.compose.runtime:runtime:$compose_ui_version"
     implementation "androidx.compose.runtime:runtime-livedata:$compose_ui_version"
 
+    //ViewModel
+    implementation "androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.5.1"
+
     //Navigation
     implementation "androidx.navigation:navigation-compose:$compose_navigation_version"
 
     //ConstraintLayout
     implementation "androidx.constraintlayout:constraintlayout-compose:1.0.1"
+
+    //Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4'
+
+    //Room
+    implementation "androidx.room:room-runtime:$room_version"
+    kapt "androidx.room:room-compiler:$room_version"
+
+    //Work Kotlin + coroutines
+    implementation "androidx.work:work-runtime-ktx:$work_version"
 }

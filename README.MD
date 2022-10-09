@@ -14,4 +14,11 @@
 - [Compose Document](https://developer.android.google.cn/jetpack/compose/documentation)
 - [Compose Library](https://developer.android.google.cn/jetpack/androidx/explorer?case=all)
 - [Compose Navigation CodeLab](https://developer.android.google.cn/codelabs/jetpack-compose-navigation#0)
-- [Compose Material Design Components])(https://developer.android.google.cn/reference/kotlin/androidx/compose/material/package-summary)
+- [Compose Material Design Components](https://developer.android.google.cn/reference/kotlin/androidx/compose/material/package-summary)
+- [Kotlin Coroutines On Android](https://developer.android.google.cn/kotlin/coroutines)
+- [Accompanist Permissions](https://google.github.io/accompanist/permissions/)
+- [Background Task](https://developer.android.google.cn/guide/background)
+- [Long Running Worker](https://developer.android.google.cn/topic/libraries/architecture/workmanager/advanced/long-running#foreground-service-type)
+### 课外资料
+
+- [Kotlin Symbol Processor](https://kotlinlang.org/docs/ksp-overview.html)

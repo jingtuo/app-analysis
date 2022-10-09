@@ -1,5 +1,6 @@
 package io.github.jingtuo.android.aa.ui.widget
 
+import android.content.pm.PackageInfo
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,14 +21,14 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.MutableLiveData
-import io.github.jingtuo.android.aa.ext.getAllPkg
-import io.github.jingtuo.android.aa.ui.model.PkgInfo
+import io.github.jingtuo.android.aa.ext.label
+import io.github.jingtuo.android.aa.ext.packages
 
 @Composable
 fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
     val context = LocalContext.current
-    val allPkg = context.getAllPkg()
-    val liveDataPkgList = MutableLiveData<List<PkgInfo>>()
+    val packages = context.packages()
+    val liveDataCurPackages = MutableLiveData<List<PackageInfo>>()
     Scaffold(
         topBar = {
             HomeTopAppBar(onClickCollectLog)
@@ -38,7 +39,7 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
         ) {
             Column(modifier = Modifier.padding(top = 10.dp)) {
                 var searchText by remember { mutableStateOf("") }
-                val curPkgList = liveDataPkgList.observeAsState(allPkg)
+                val curPackages = liveDataCurPackages.observeAsState(packages)
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -48,9 +49,10 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
                         value = searchText,
                         onValueChange = {
                             searchText = it
-                            liveDataPkgList.value = allPkg.filter { pkgInfo ->
-                                pkgInfo.pkgName.contains(searchText)
-                                        || pkgInfo.appName.contains(searchText)
+                            liveDataCurPackages.value = packages.filter { pkgInfo ->
+                                pkgInfo.packageName.contains(searchText)
+                                        || pkgInfo.label(context.packageManager)
+                                    .contains(searchText)
                             }
                         },
                         leadingIcon = {
@@ -79,7 +81,7 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
                     )
                 }
                 LazyColumn {
-                    items(curPkgList.value) { it ->
+                    items(curPackages.value) { it ->
                         AppRow(it, onClickItem)
                         Divider()
                     }
@@ -92,21 +94,22 @@ fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Uni
 }
 
 @Composable
-fun AppRow(pkgInfo: PkgInfo, onClickItem: (pkgName: String) -> Unit) {
+fun AppRow(packageInfo: PackageInfo, onClickItem: (pkgName: String) -> Unit) {
+    val context = LocalContext.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(16.dp, 10.dp)
             .clickable {
-                onClickItem(pkgInfo.pkgName)
+                onClickItem(packageInfo.packageName)
             }
     ) {
         Text(
-            text = pkgInfo.appName,
+            text = packageInfo.label(context.packageManager),
             color = MaterialTheme.colors.onBackground
         )
         Text(
-            text = pkgInfo.pkgName,
+            text = packageInfo.packageName,
             color = MaterialTheme.colors.onBackground,
             fontSize = 14.sp
         )
