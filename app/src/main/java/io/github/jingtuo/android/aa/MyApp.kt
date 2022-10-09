@@ -14,4 +14,8 @@ class MyApp: Application() {
 //            .penaltyLog()
 //            .build())
     }
+
+    companion object {
+        const val CHANNEL_ID_LOG = "Log"
+    }
 }

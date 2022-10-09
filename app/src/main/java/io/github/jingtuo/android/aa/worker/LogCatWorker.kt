@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import androidx.work.*
+import io.github.jingtuo.android.aa.MyApp
 import io.github.jingtuo.android.aa.R
 import io.github.jingtuo.android.aa.db.AaDatabase
 import io.github.jingtuo.android.aa.db.LogDao
@@ -40,7 +41,7 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
 
     override suspend fun doWork(): Result {
         //OPPO Reno3手机不支持foregroundServiceType
-        //setForeground(createForegroundInfo())
+//        setForeground(createForegroundInfo())
         collectLog()
         return Result.success()
     }
@@ -148,20 +149,19 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
 
     @NonNull
     private fun createForegroundInfo(): ForegroundInfo {
-        val id = "LogCat"
         val title = applicationContext.getString(R.string.app_name)
         val content = applicationContext.getString(R.string.collecting_logs)
         val stop = applicationContext.getString(R.string.stop)
         // This PendingIntent can be used to cancel the worker
         val intent = WorkManager.getInstance(applicationContext)
-            .createCancelPendingIntent(getId())
+            .createCancelPendingIntent(id)
 
         // Create a Notification channel if necessary
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createChannel()
         }
 
-        val notification = NotificationCompat.Builder(applicationContext, id)
+        val notification = NotificationCompat.Builder(applicationContext, MyApp.CHANNEL_ID_LOG)
             .setContentTitle(title)
             .setTicker(title)
             .setContentText(content)
@@ -169,6 +169,7 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
             .setOngoing(true)
             // Add the cancel action to the notification which can
             // be used to cancel the worker
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .addAction(R.drawable.ic_baseline_stop_24, stop, intent)
             .build()
 
@@ -182,9 +183,5 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
     @RequiresApi(Build.VERSION_CODES.O)
     private fun createChannel() {
         // Create a Notification channel
-    }
-
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        return createForegroundInfo()
     }
 }

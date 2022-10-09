@@ -19,6 +19,11 @@
 - [Accompanist Permissions](https://google.github.io/accompanist/permissions/)
 - [Background Task](https://developer.android.google.cn/guide/background)
 - [Long Running Worker](https://developer.android.google.cn/topic/libraries/architecture/workmanager/advanced/long-running#foreground-service-type)
+    使用WorkManager启动一个前台服务, OPPO Reno3出现如下错误:
+    ```text
+    java.lang.IllegalArgumentException: foregroundServiceType 0x00000001 is not a subset of foregroundServiceType attribute 0x00000000 in service element of manifest file
+    ```
+  
 ### 课外资料
 
 - [Kotlin Symbol Processor](https://kotlinlang.org/docs/ksp-overview.html)

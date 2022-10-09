@@ -1,6 +1,7 @@
 package io.github.jingtuo.android.aa.ui.widget
 
 import android.app.Application
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,14 +32,15 @@ fun LogList(application: Application, viewModel: LogViewModel = viewModel(
         }
     ) { innerPadding ->
         val logs = viewModel.logs().observeAsState(emptyList())
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+        Column(
+            modifier = Modifier.fillMaxWidth().padding(innerPadding)
         ) {
-            items(logs.value) { it ->
-                LogRow(logInfo = it, viewModel)
-                Divider()
+            
+            LazyColumn{
+                items(logs.value) { it ->
+                    LogRow(logInfo = it, viewModel)
+                    Divider()
+                }
             }
         }
     }

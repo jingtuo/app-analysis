@@ -10,6 +10,7 @@ import androidx.work.WorkManager
 import io.github.jingtuo.android.aa.db.AaDatabase
 import io.github.jingtuo.android.aa.db.LogDao
 import io.github.jingtuo.android.aa.db.model.LogInfo
+import io.github.jingtuo.android.aa.worker.ClearLogWorker
 import io.github.jingtuo.android.aa.worker.LogCatWorker
 
 const val WHITE_SPACE = ' '
@@ -42,7 +43,7 @@ class LogRepo(appContext: Context) {
         val request = OneTimeWorkRequestBuilder<LogCatWorker>()
             .addTag(TAG)
             .setConstraints(constraints)
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .setExpedited(OutOfQuotaPolicy.DROP_WORK_REQUEST)
             .build()
         workManager.enqueue(request)
     }
@@ -53,5 +54,12 @@ class LogRepo(appContext: Context) {
 
     companion object {
         const val TAG = "LogCat"
+    }
+
+    fun clearLog() {
+        val request = OneTimeWorkRequestBuilder<ClearLogWorker>()
+            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+            .build()
+        workManager.enqueue(request)
     }
 }
