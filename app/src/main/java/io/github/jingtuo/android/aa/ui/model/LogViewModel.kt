@@ -19,6 +19,10 @@ class LogViewModel(app: Application) : AndroidViewModel(app) {
 
     private var source: LiveData<List<LogInfo>>? = null
 
+    init {
+        loadLogs()
+    }
+
     fun logs(): LiveData<List<LogInfo>> {
         return logs
     }

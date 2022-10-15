@@ -26,7 +26,7 @@ fun createNotification(
     } else {
         PendingIntent.FLAG_ONE_SHOT
     }
-    val startIntent = Intent(LogService.LogReceiver.ACTION_LOGCAT).apply {
+    val startIntent = Intent(LogService.ACTION_LOGCAT).apply {
         putExtra(LogService.KEY_OPERATE, operate)
     }
     val pIntent = PendingIntent.getBroadcast(context, 0, startIntent, flags)
@@ -56,7 +56,7 @@ class LogService : Service() {
     }
 
     companion object {
-        const val ACTION_LOGCAT_SERVICE = "io.github.jingtuo.android.aa.action.LOGCAT_SERVICE"
+        const val ACTION_LOGCAT = "io.github.jingtuo.android.aa.action.LOGCAT"
         const val KEY_OPERATE = "operate"
         const val OPERATE_START = "start"
         const val OPERATE_STOP = "stop"
@@ -90,7 +90,7 @@ class LogService : Service() {
             }
             receiver = LogReceiver()
             val filter = IntentFilter()
-            filter.addAction(LogReceiver.ACTION_LOGCAT)
+            filter.addAction(ACTION_LOGCAT)
             registerReceiver(receiver, filter)
         }
         return START_NOT_STICKY
@@ -150,7 +150,7 @@ class LogService : Service() {
         }
 
         companion object {
-            const val ACTION_LOGCAT = "io.github.jingtuo.android.aa.action.LOGCAT"
+
         }
     }
 

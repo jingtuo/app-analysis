@@ -25,13 +25,13 @@ import io.github.jingtuo.android.aa.ext.label
 import io.github.jingtuo.android.aa.ext.packages
 
 @Composable
-fun AppList(onClickCollectLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
+fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
     val context = LocalContext.current
     val packages = context.packages()
     val liveDataCurPackages = MutableLiveData<List<PackageInfo>>()
     Scaffold(
         topBar = {
-            HomeTopAppBar(onClickCollectLog)
+            HomeTopAppBar(onClickLog)
         }
     ) { innerPadding ->
         Surface(

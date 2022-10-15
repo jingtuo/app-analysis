@@ -10,6 +10,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
@@ -21,62 +22,139 @@ import io.github.jingtuo.android.aa.db.model.LogInfo
 
 @Composable
 fun LogList(
-    application: Application, viewModel: LogViewModel = viewModel(
+    application: Application,
+    viewModel: LogViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application = application)
-    )
+    ),
+    onClickBack: () -> Unit
 ) {
+    var filterDialog by remember { mutableStateOf(false) }
+    var tagText by remember { mutableStateOf("") }
+    var prioritySelected by remember { mutableStateOf("All") }
+    var priorityExpanded by remember { mutableStateOf(false) }
+    var contentText by remember { mutableStateOf("") }
     Scaffold(
         topBar = {
-            MyTopAppBar(title = "日志列表", R.drawable.ic_baseline_point_line_list_24)
+            LogListAppBar(
+                onClickBack = onClickBack,
+                onClickFilter = {
+                    filterDialog = true
+                })
         }
     ) { innerPadding ->
         val logs = viewModel.logs().observeAsState(emptyList())
-        viewModel.loadLogs()
-        var priorityExpanded by remember { mutableStateOf(false) }
-        var prioritySelected by remember { mutableStateOf("All") }
-        val priorityList = listOf("All", "Debug",
+        val priorityList = listOf(
+            "All", "Debug",
             "Info", "Warn", "Error",
-            "Fatal", "Silent", "Verbose")
-        Column(
+            "Fatal", "Silent", "Verbose"
+        )
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 10.dp)
-            ) {
-                Text(text = "Priority: ")
-                OutlinedButton(
-                    onClick = { priorityExpanded = true }
-                ) {
-                    Text(text = prioritySelected)
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
-                        contentDescription = "drop down"
-                    )
-                }
+            items(logs.value) { it ->
+                LogRow(logInfo = it, viewModel)
+                Divider()
             }
-            LazyColumn {
-                items(logs.value) { it ->
-                    LogRow(logInfo = it, viewModel)
-                    Divider()
-                }
-            }
-            DropdownMenu(expanded = priorityExpanded, onDismissRequest = { priorityExpanded = false }) {
-                for(item in priorityList) {
-                    DropdownMenuItem(onClick = {
-                        priorityExpanded = false
-                        prioritySelected = item
-                        //更新数据
-                        viewModel.loadLogs("", item, "")
-                    }) {
-                        Text(text = item)
+        }
+
+        if (filterDialog) {
+            AlertDialog(
+                onDismissRequest = {
+                    filterDialog = false
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            filterDialog = false
+                            viewModel.loadLogs(tagText, prioritySelected, contentText)
+                        }
+                    ) {
+                        Text("确定")
                     }
-                    Divider()
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            filterDialog = false
+                        }
+                    ) {
+                        Text("取消")
+                    }
+                },
+                title = {
+                    Text("过滤日志")
+                },
+                text = {
+                    ConstraintLayout {
+                        val (tagId, priorityId, contentId) = createRefs()
+                        OutlinedTextField(
+                            value = tagText,
+                            onValueChange = {
+                                tagText = it
+                            },
+                            label = {
+                                Text("TAG")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .constrainAs(tagId) {
+                                    top.linkTo(parent.top)
+                                    start.linkTo(parent.start)
+                                }
+                        )
+                        OutlinedButton(
+                            onClick = { priorityExpanded = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .constrainAs(priorityId) {
+                                    top.linkTo(tagId.bottom, 10.dp)
+                                    start.linkTo(parent.start)
+                                }
+                        ) {
+                            Text(
+                                text = prioritySelected,
+                                modifier = Modifier.weight(1.0F, true)
+                            )
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
+                                contentDescription = "drop down"
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = priorityExpanded,
+                            onDismissRequest = { priorityExpanded = false },
+                        ) {
+                            for (item in priorityList) {
+                                DropdownMenuItem(onClick = {
+                                    priorityExpanded = false
+                                    prioritySelected = item
+                                }) {
+                                    Text(text = item, modifier = Modifier.fillMaxWidth())
+                                }
+                                Divider()
+                            }
+                        }
+                        OutlinedTextField(
+                            value = contentText,
+                            onValueChange = {
+                                contentText = it
+                            },
+                            label = {
+                                Text("内容")
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 2.dp)
+                                .constrainAs(contentId) {
+                                    top.linkTo(priorityId.bottom, 10.dp)
+                                    start.linkTo(parent.start)
+                                }
+                        )
+                    }
                 }
-            }
+            )
         }
     }
 }
@@ -125,7 +203,8 @@ fun LogRow(logInfo: LogInfo, viewModel: LogViewModel) {
                 width = Dimension.fillToConstraints
                 horizontalChainWeight = 1.0F
             },
-            maxLines = 1
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
         Text(
             text = "Priority: ${logInfo.priority}",

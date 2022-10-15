@@ -1,6 +1,15 @@
 # 应用分析(App Analysis)
 
-## 版本差异
+基于Compose开发应用分析, 熟悉Compose的基本使用以及部分组件(navigation, worker)
+
+## 版本
+
+### 1.0.0
+
+1. 基于logcat命令收集系统运行日志
+
+
+## 系统版本差异
 
 1. 系统 \> Android 10(API 29), 只有部分应用对当前应用可见
 
