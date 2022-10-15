@@ -1,16 +1,9 @@
 package io.github.jingtuo.android.aa.worker
 
-import android.app.NotificationManager
 import android.content.Context
-import android.content.pm.ServiceInfo
 import android.os.Build
-import androidx.annotation.NonNull
-import androidx.annotation.RequiresApi
-import androidx.core.app.NotificationCompat
 import androidx.room.Room
 import androidx.work.*
-import io.github.jingtuo.android.aa.MyApp
-import io.github.jingtuo.android.aa.R
 import io.github.jingtuo.android.aa.db.AaDatabase
 import io.github.jingtuo.android.aa.db.LogDao
 import io.github.jingtuo.android.aa.db.model.LogInfo
@@ -23,15 +16,11 @@ import java.util.*
 
 const val CACHE_SIZE = 100
 
-class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
-    CoroutineWorker(appContext, workerParams) {
+class LogCatWorker(appContext: Context, workerParams: WorkerParameters) : Worker(appContext, workerParams) {
 
     private val logDao: LogDao
 
     private val logs = mutableListOf<LogInfo>()
-
-    private val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as
-            NotificationManager
 
     init {
         val database = Room.databaseBuilder(appContext, AaDatabase::class.java, "app_analysis")
@@ -39,9 +28,7 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
         logDao = database.logDao()
     }
 
-    override suspend fun doWork(): Result {
-        //OPPO Reno3手机不支持foregroundServiceType
-//        setForeground(createForegroundInfo())
+    override fun doWork(): Result {
         collectLog()
         return Result.success()
     }
@@ -147,41 +134,11 @@ class LogCatWorker(appContext: Context, workerParams: WorkerParameters) :
         return logInfo
     }
 
-    @NonNull
-    private fun createForegroundInfo(): ForegroundInfo {
-        val title = applicationContext.getString(R.string.app_name)
-        val content = applicationContext.getString(R.string.collecting_logs)
-        val stop = applicationContext.getString(R.string.stop)
-        // This PendingIntent can be used to cancel the worker
-        val intent = WorkManager.getInstance(applicationContext)
-            .createCancelPendingIntent(id)
-
-        // Create a Notification channel if necessary
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            createChannel()
+    override fun onStopped() {
+        if (logs.isNotEmpty()) {
+            logDao.insertLogs(logs)
+            logs.clear()
         }
-
-        val notification = NotificationCompat.Builder(applicationContext, MyApp.CHANNEL_ID_LOG)
-            .setContentTitle(title)
-            .setTicker(title)
-            .setContentText(content)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setOngoing(true)
-            // Add the cancel action to the notification which can
-            // be used to cancel the worker
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .addAction(R.drawable.ic_baseline_stop_24, stop, intent)
-            .build()
-
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            ForegroundInfo(1, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-        } else {
-            ForegroundInfo(1, notification)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createChannel() {
-        // Create a Notification channel
+        super.onStopped()
     }
 }

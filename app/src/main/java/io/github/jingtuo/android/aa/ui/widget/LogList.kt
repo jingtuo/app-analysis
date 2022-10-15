@@ -1,18 +1,14 @@
 package io.github.jingtuo.android.aa.ui.widget
 
 import android.app.Application
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -24,21 +20,60 @@ import io.github.jingtuo.android.aa.R
 import io.github.jingtuo.android.aa.db.model.LogInfo
 
 @Composable
-fun LogList(application: Application, viewModel: LogViewModel = viewModel(
-        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application = application))) {
+fun LogList(
+    application: Application, viewModel: LogViewModel = viewModel(
+        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application = application)
+    )
+) {
     Scaffold(
         topBar = {
             MyTopAppBar(title = "日志列表", R.drawable.ic_baseline_point_line_list_24)
         }
     ) { innerPadding ->
         val logs = viewModel.logs().observeAsState(emptyList())
+        viewModel.loadLogs()
+        var priorityExpanded by remember { mutableStateOf(false) }
+        var prioritySelected by remember { mutableStateOf("All") }
+        val priorityList = listOf("All", "Debug",
+            "Info", "Warn", "Error",
+            "Fatal", "Silent", "Verbose")
         Column(
-            modifier = Modifier.fillMaxWidth().padding(innerPadding)
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
         ) {
-            
-            LazyColumn{
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 10.dp)
+            ) {
+                Text(text = "Priority: ")
+                OutlinedButton(
+                    onClick = { priorityExpanded = true }
+                ) {
+                    Text(text = prioritySelected)
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_baseline_arrow_drop_down_24),
+                        contentDescription = "drop down"
+                    )
+                }
+            }
+            LazyColumn {
                 items(logs.value) { it ->
                     LogRow(logInfo = it, viewModel)
+                    Divider()
+                }
+            }
+            DropdownMenu(expanded = priorityExpanded, onDismissRequest = { priorityExpanded = false }) {
+                for(item in priorityList) {
+                    DropdownMenuItem(onClick = {
+                        priorityExpanded = false
+                        prioritySelected = item
+                        //更新数据
+                        viewModel.loadLogs("", item, "")
+                    }) {
+                        Text(text = item)
+                    }
                     Divider()
                 }
             }

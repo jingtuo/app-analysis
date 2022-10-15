@@ -23,7 +23,8 @@
     ```text
     java.lang.IllegalArgumentException: foregroundServiceType 0x00000001 is not a subset of foregroundServiceType attribute 0x00000000 in service element of manifest file
     ```
-  
+- [Notification](https://developer.android.google.cn/develop/ui/views/notifications)
+
 ### 课外资料
 
 - [Kotlin Symbol Processor](https://kotlinlang.org/docs/ksp-overview.html)

@@ -25,4 +25,9 @@ interface LogDao {
 
     @Query("delete from log_info where time <= :time")
     fun deleteBefore(time: Date): Int
+
+    @Query("select * from log_info where (:tag = '' or tag like :tag) " +
+            "and (:priority='All' or priority = :priority) " +
+            "and (:text='' or content like :text) order by time desc")
+    fun find(tag: String, priority: String, text: String): LiveData<List<LogInfo>>
 }

@@ -17,5 +17,6 @@ class MyApp: Application() {
 
     companion object {
         const val CHANNEL_ID_LOG = "Log"
+        const val NOTIFICATION_ID = "notification_id"
     }
 }

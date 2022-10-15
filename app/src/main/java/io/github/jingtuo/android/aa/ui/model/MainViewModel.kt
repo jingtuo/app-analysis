@@ -14,25 +14,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val logRepo = LogRepo(application)
 
-    private val notificationManager =
-        application.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-    init {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.createNotificationChannel(
-                NotificationChannel(
-                    MyApp.CHANNEL_ID_LOG,
-                    application.getString(R.string.channel_log),
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-            )
-        }
-    }
-
-    fun startLogCat() {
-        logRepo.startLogCat()
-    }
-
     override fun onCleared() {
         super.onCleared()
         logRepo.stopLogCat()

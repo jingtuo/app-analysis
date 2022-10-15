@@ -36,18 +36,6 @@ class LogRepo(appContext: Context) {
         return logDao.getAll()
     }
 
-    fun startLogCat() {
-        val constraints = Constraints.Builder()
-            .setRequiresStorageNotLow(true)
-            .build()
-        val request = OneTimeWorkRequestBuilder<LogCatWorker>()
-            .addTag(TAG)
-            .setConstraints(constraints)
-            .setExpedited(OutOfQuotaPolicy.DROP_WORK_REQUEST)
-            .build()
-        workManager.enqueue(request)
-    }
-
     fun stopLogCat() {
         workManager.cancelAllWorkByTag(TAG)
     }
@@ -61,5 +49,9 @@ class LogRepo(appContext: Context) {
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .build()
         workManager.enqueue(request)
+    }
+
+    fun loadLogs(tag: String, priority: String, text: String): LiveData<List<LogInfo>> {
+        return logDao.find(tag, priority, text)
     }
 }
