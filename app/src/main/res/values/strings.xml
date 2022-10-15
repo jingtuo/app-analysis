@@ -11,4 +11,5 @@
     <string name="notification_permission_rationale">通知权限: 用于在通知栏显示收集日志的状态</string>
     <string name="grant">授予</string>
     <string name="deny">拒绝</string>
+    <string name="collect_logs_in_log_list_prompt">请退出日志列表之后, 再收集日志</string>
 </resources>

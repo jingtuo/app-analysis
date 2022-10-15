@@ -10,6 +10,7 @@ import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.os.Build
 import android.os.IBinder
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
@@ -22,9 +23,9 @@ fun createNotification(
     context: Context, operate: String, content: String, actionIconId: Int, actionTitle: String
 ): Notification {
     val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     } else {
-        PendingIntent.FLAG_ONE_SHOT
+        PendingIntent.FLAG_UPDATE_CURRENT
     }
     val startIntent = Intent(LogService.ACTION_LOGCAT).apply {
         putExtra(LogService.KEY_OPERATE, operate)
@@ -45,14 +46,8 @@ class LogService : Service() {
 
     private var receiver: LogReceiver? = null
 
-    private var logRepo: LogRepo? = null
-
     override fun onBind(intent: Intent?): IBinder? {
         TODO("Not yet implemented")
-    }
-
-    override fun onCreate() {
-        super.onCreate()
     }
 
     companion object {
@@ -119,6 +114,20 @@ class LogService : Service() {
                 )
                 notificationManager.notify(NOTIFICATION_ID, notification)
             } else {
+                //检测是否在日志页面
+                if (MyApp.instance().inLogList) {
+                    //请先退出日志列表页面
+                    val notificationManager = NotificationManagerCompat.from(context)
+                    val notification = createNotification(
+                        context,
+                        OPERATE_START,
+                        context.getString(R.string.collect_logs_in_log_list_prompt),
+                        R.drawable.ic_baseline_play_arrow_24,
+                        context.getString(R.string.start_collect_logs)
+                    )
+                    notificationManager.notify(NOTIFICATION_ID, notification)
+                    return
+                }
                 //开始收集日志
                 val workManager = WorkManager.getInstance(context)
                 val constraint = Constraints.Builder()

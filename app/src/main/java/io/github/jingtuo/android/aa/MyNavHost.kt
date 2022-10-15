@@ -36,6 +36,7 @@ fun MyNavHost(navController: NavHostController, application: Application) {
                             .setLaunchSingleTop(true)
                             .build()
                     )
+                    MyApp.instance().inLogList = true
                 },
                 onClickItem = { pkgName ->
                     navController.navigate("app_info/$pkgName")
@@ -48,6 +49,7 @@ fun MyNavHost(navController: NavHostController, application: Application) {
         composable(route = LogListDestination.route) {
             LogList(application = application, onClickBack = {
                 navController.popBackStack()
+                MyApp.instance().inLogList = false
             })
         }
     }

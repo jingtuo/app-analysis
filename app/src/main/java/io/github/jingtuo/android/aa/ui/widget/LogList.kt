@@ -36,7 +36,9 @@ fun LogList(
     Scaffold(
         topBar = {
             LogListAppBar(
-                onClickBack = onClickBack,
+                onClickBack = {
+                    onClickBack()
+                },
                 onClickFilter = {
                     filterDialog = true
                 })

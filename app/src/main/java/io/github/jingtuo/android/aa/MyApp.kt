@@ -1,22 +1,22 @@
 package io.github.jingtuo.android.aa
 
 import android.app.Application
-import android.os.StrictMode
-import android.os.StrictMode.ThreadPolicy
+import kotlin.properties.Delegates
 
 class MyApp: Application() {
 
+    //标记是否日志列表
+    var inLogList: Boolean = false
+
     override fun onCreate() {
         super.onCreate()
-        //严苛模式
-//        StrictMode.setThreadPolicy(ThreadPolicy.Builder()
-//            .detectAll()
-//            .penaltyLog()
-//            .build())
+        instance = this
     }
 
     companion object {
         const val CHANNEL_ID_LOG = "Log"
         const val NOTIFICATION_ID = "notification_id"
+        private var instance: MyApp by Delegates.notNull()
+        fun instance() = instance
     }
 }
