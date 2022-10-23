@@ -19,10 +19,19 @@ fun Context.packageInfo(pkgName: String): PackageInfo {
 
 //获取所有包
 fun Context.packages(): List<PackageInfo> {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(0))
+    var flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        PackageManager.MATCH_UNINSTALLED_PACKAGES
     } else {
-        packageManager.getInstalledPackages(0)
+        PackageManager.GET_UNINSTALLED_PACKAGES
+    }
+    flags = flags or PackageManager.GET_SIGNATURES
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        flags = flags or PackageManager.GET_SIGNING_CERTIFICATES
+    }
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        packageManager.getInstalledPackages(PackageManager.PackageInfoFlags.of(flags.toLong()))
+    } else {
+        packageManager.getInstalledPackages(flags)
     }
 }
 

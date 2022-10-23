@@ -2,10 +2,7 @@ package io.github.jingtuo.android.aa.ui.widget
 
 import android.content.pm.PackageInfo
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
@@ -16,13 +13,19 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ChainStyle
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.MutableLiveData
 import io.github.jingtuo.android.aa.ext.label
 import io.github.jingtuo.android.aa.ext.packages
+import io.github.jingtuo.android.aa.ext.signInfo
+import kotlinx.coroutines.selects.select
 
 @Composable
 fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
@@ -96,22 +99,65 @@ fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
 @Composable
 fun AppRow(packageInfo: PackageInfo, onClickItem: (pkgName: String) -> Unit) {
     val context = LocalContext.current
+    val labelWidth = 70.dp
+    val dividerHeight = 6.dp
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp, 10.dp)
+            .padding(horizontal = 16.dp, vertical = 10.dp)
             .clickable {
                 onClickItem(packageInfo.packageName)
             }
     ) {
-        Text(
-            text = packageInfo.label(context.packageManager),
-            color = MaterialTheme.colors.onBackground
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "应用名: ",
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.width(labelWidth)
+            )
+            Text(
+                text = packageInfo.label(context.packageManager),
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Divider(
+            modifier = Modifier.fillMaxWidth().height(dividerHeight),
+            color = Color.Transparent
         )
-        Text(
-            text = packageInfo.packageName,
-            color = MaterialTheme.colors.onBackground,
-            fontSize = 14.sp
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "包名: ",
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.width(labelWidth)
+            )
+            Text(
+                text = packageInfo.packageName,
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+        Divider(
+            modifier = Modifier.fillMaxWidth().height(dividerHeight),
+            color = Color.Transparent
         )
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "MD5: ",
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.width(labelWidth)
+            )
+            Text(
+                text = packageInfo.signInfo("MD5", true),
+                color = MaterialTheme.colors.onBackground,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
     }
 }

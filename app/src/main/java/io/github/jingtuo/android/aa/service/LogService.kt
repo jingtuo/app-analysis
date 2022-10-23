@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.*
+import io.github.jingtuo.android.aa.MainActivity
 import io.github.jingtuo.android.aa.MyApp
 import io.github.jingtuo.android.aa.R
 import io.github.jingtuo.android.aa.repo.LogRepo
@@ -30,13 +31,16 @@ fun createNotification(
     val startIntent = Intent(LogService.ACTION_LOGCAT).apply {
         putExtra(LogService.KEY_OPERATE, operate)
     }
-    val pIntent = PendingIntent.getBroadcast(context, 0, startIntent, flags)
+    val mainIntent = Intent(context, MainActivity::class.java)
+    val contentIntent = PendingIntent.getActivity(context, 0, mainIntent, flags)
+    val pIntent = PendingIntent.getBroadcast(context, 1, startIntent, flags)
     return NotificationCompat.Builder(context, MyApp.CHANNEL_ID_LOG)
         .setSmallIcon(R.drawable.ic_baseline_downloading_24)
         .setContentTitle(context.getString(R.string.log_service))
         .setContentText(content)
         .setAutoCancel(false)
         .setOngoing(true)
+        .setContentIntent(contentIntent)
         .addAction(actionIconId, actionTitle, pIntent)
         .build()
 }

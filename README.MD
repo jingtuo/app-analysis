@@ -17,7 +17,8 @@
 
 ## 问题
 
-1. 应用升级之后未打开, PackageManager.getPackageInfo获取activities为空, 
+1. 应用升级之后未打开, PackageManager.getPackageInfo获取activities为空
+2. Compose的ConstraintLayout存在问题
 
 ## 参考资料
 
