@@ -17,21 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.constraintlayout.compose.ChainStyle
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewmodel.compose.viewModel
 import io.github.jingtuo.android.aa.ext.label
-import io.github.jingtuo.android.aa.ext.packages
 import io.github.jingtuo.android.aa.ext.signInfo
-import kotlinx.coroutines.selects.select
+import io.github.jingtuo.android.aa.ui.model.AppListViewModel
 
 @Composable
-fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
-    val context = LocalContext.current
-    val packages = context.packages()
-    val liveDataCurPackages = MutableLiveData<List<PackageInfo>>()
+fun AppList(vm: AppListViewModel = viewModel(), onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
     Scaffold(
         topBar = {
             HomeTopAppBar(onClickLog)
@@ -42,7 +34,7 @@ fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
         ) {
             Column(modifier = Modifier.padding(top = 10.dp)) {
                 var searchText by remember { mutableStateOf("") }
-                val curPackages = liveDataCurPackages.observeAsState(packages)
+                val curPackages = vm.curPackages().observeAsState(emptyList<PackageInfo>())
                 Surface(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
@@ -52,11 +44,7 @@ fun AppList(onClickLog: () -> Unit, onClickItem: (pkgName: String) -> Unit) {
                         value = searchText,
                         onValueChange = {
                             searchText = it
-                            liveDataCurPackages.value = packages.filter { pkgInfo ->
-                                pkgInfo.packageName.contains(searchText)
-                                        || pkgInfo.label(context.packageManager)
-                                    .contains(searchText)
-                            }
+                            vm.search(it)
                         },
                         leadingIcon = {
                             Icon(
@@ -124,7 +112,9 @@ fun AppRow(packageInfo: PackageInfo, onClickItem: (pkgName: String) -> Unit) {
             )
         }
         Divider(
-            modifier = Modifier.fillMaxWidth().height(dividerHeight),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dividerHeight),
             color = Color.Transparent
         )
         Row(
@@ -142,7 +132,9 @@ fun AppRow(packageInfo: PackageInfo, onClickItem: (pkgName: String) -> Unit) {
             )
         }
         Divider(
-            modifier = Modifier.fillMaxWidth().height(dividerHeight),
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(dividerHeight),
             color = Color.Transparent
         )
         Row(

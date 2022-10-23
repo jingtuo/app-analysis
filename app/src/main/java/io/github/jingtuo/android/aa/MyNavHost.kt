@@ -47,7 +47,7 @@ fun MyNavHost(navController: NavHostController, application: Application) {
             AppInfo(entry.arguments?.getString("pkgName") ?: "")
         }
         composable(route = LogListDestination.route) {
-            LogList(application = application, onClickBack = {
+            LogList(onClickBack = {
                 navController.popBackStack()
                 MyApp.instance().inLogList = false
             })

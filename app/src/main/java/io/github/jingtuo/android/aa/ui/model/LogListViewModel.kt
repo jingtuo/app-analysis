@@ -9,7 +9,7 @@ import io.github.jingtuo.android.aa.db.model.LogInfo
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LogViewModel(app: Application) : AndroidViewModel(app) {
+class LogListViewModel(app: Application) : AndroidViewModel(app) {
 
     private val logRepo = LogRepo(app)
 

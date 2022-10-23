@@ -1,6 +1,5 @@
 package io.github.jingtuo.android.aa.ui.widget
 
-import android.app.Application
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -14,18 +13,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import io.github.jingtuo.android.aa.ui.model.LogViewModel
+import io.github.jingtuo.android.aa.ui.model.LogListViewModel
 import io.github.jingtuo.android.aa.R
 import io.github.jingtuo.android.aa.db.model.LogInfo
 
 @Composable
 fun LogList(
-    application: Application,
-    viewModel: LogViewModel = viewModel(
-        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application = application)
-    ),
+    viewModel: LogListViewModel = viewModel(),
     onClickBack: () -> Unit
 ) {
     var filterDialog by remember { mutableStateOf(false) }
@@ -162,7 +157,7 @@ fun LogList(
 }
 
 @Composable
-fun LogRow(logInfo: LogInfo, viewModel: LogViewModel) {
+fun LogRow(logInfo: LogInfo, viewModel: LogListViewModel) {
     ConstraintLayout(
         modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
     ) {
