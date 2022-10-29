@@ -11,6 +11,7 @@
 
 1. 应用升级之后未打开, PackageManager.getPackageInfo获取activities为空
 2. Compose的ConstraintLayout存在问题
+3. 暂时未找到将Drawable转换成ImageBitmap的方法
 
 ## 参考资料
 

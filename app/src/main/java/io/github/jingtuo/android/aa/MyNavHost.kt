@@ -7,14 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptions
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.work.WorkManager
 import io.github.jingtuo.android.aa.service.LogService
-import io.github.jingtuo.android.aa.ui.widget.AppInfo
-import io.github.jingtuo.android.aa.ui.widget.AppList
-import io.github.jingtuo.android.aa.ui.widget.LogList
+import io.github.jingtuo.android.aa.ui.widget.*
 
 @Composable
 fun MyNavHost(navController: NavHostController, application: Application) {
@@ -44,13 +40,25 @@ fun MyNavHost(navController: NavHostController, application: Application) {
             )
         }
         composable(route = AppInfoDestination.route) { entry ->
-            AppInfo(entry.arguments?.getString("pkgName") ?: "")
+            AppInfo(entry.arguments?.getString("pkgName") ?: "",
+                onClickPageList = {
+                    navController.navigate("activity_list/$it")
+                },
+                onClickPermissionList = {
+                    navController.navigate("permission_list/$it")
+                })
         }
         composable(route = LogListDestination.route) {
             LogList(onClickBack = {
                 navController.popBackStack()
                 MyApp.instance().inLogList = false
             })
+        }
+        composable(route = ActivityListDestination.route) { entry ->
+            ActivityList(pkgName = entry.arguments?.getString("pkgName") ?: "")
+        }
+        composable(route = PermissionListDestination.route) { entry ->
+            PermissionList(pkgName = entry.arguments?.getString("pkgName") ?: "")
         }
     }
 }
